@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Home page</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<p>
+		<span>Employee List</span>
+	</p>
+	<div th:if="${ not#lists.isEmpty(listEmployee)}">
+		<table border="1px">
+			<tr class="sort">
+				<th><a th:href="@{/all/1/5/firstName}">First Name</a></th>
+				<th><a th:href="@{/all/1/5/lastName}">Last Name</a></th>
+				<th><a th:href="@{/all/1/5/email}">Email</a></th>
+				<th><a th:href="@{/all/1/5/phone}">Phone Number</a></th>
+				<th><a th:href="@{/all/1/5/createdDate}">Created Date</a></th>
+				<th><a th:href="@{/all/1/5/createdBy}">Created By</a></th>
+				<th><a th:href="@{/all/1/5/editedDate}">Edited Date</a></th>
+				<th><a th:href="@{/all/1/5/editedBy}">Edited By</a></th>
+				<th>Designation</th>
+
+			</tr>
+			<tr th:each="employee : ${listEmployee}">
+				<td th:text="${employee.firstName}"></td>
+				<td th:text="${employee.lastName}"></td>
+				<td th:text="${employee.email}"></td>
+				<td th:text="${employee.phone}"></td>
+				<td th:text="${employee.createdDate}"></td>
+				<td th:text="${employee.createdBy}"></td>
+				<td th:text="${employee.editedDate}"></td>
+				<td th:text="${employee.editedBy}"></td>
+
+				<td>
+					<ul>
+						<li th:each="designations : ${employee.designation}">[[${designations.title}]]</li>
+					</ul>
+				</td>
+				<td><a th:href="@{/employee/{id}(id=${employee.id})}"
+					class="btn btn-danger edit">Edit</a></td>
+				<td><a th:href="@{/delete/employee/{id}(id=${employee.id})}"
+					class="btn btn-danger delete">Delete</a></td>
+			</tr>
+		</table>
+		<div th:if="${totalPages > 1}">
+			<div class="row col-sm-10">
+				<div class="col-sm-2">Total Rows: [[${totalItems}]]</div>
+				<div class="col-sm-1">
+					<span class="pagination"
+						th:each="i: ${#numbers.sequence(1, totalPages)}"> <a
+						th:if="${currentPage != i}"
+						th:href="@{'/all/'+${i}+'/5/'+${sortField}}">[[${i}]]</a> <span
+						th:unless="${currentPage != i}">[[${i}]]</span> &nbsp; &nbsp;
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(".pagination").on("click", function(e) {
+			e.preventDefault();
+			if (e.target.href) {
+				send_request(e.target.href, "GET", function(response) {
+					$("#response").html(response);
+				});
+			}
+		});
+		$(".delete").on("click", function(e) {
+			e.preventDefault();
+			send_request(e.target.href, "DELETE", function() {
+				$(e.target.parentElement.parentElement).html("");
+			});
+
+		});
+		$(".sort th a").on("click", function(e) {
+			e.preventDefault();
+			if (e.target.href) {
+				send_request(e.target.href, "GET", function(response) {
+					$("#response").html(response);
+				});
+			}
+		});
+		$(".edit").on("click", function(e) {
+			e.preventDefault();
+			if (e.target.href) {
+				send_request(e.target.href, "GET", function(response) {
+					$("#response").html(response);
+				});
+			}
+		});
+		function send_request(url, method, callback) {
+			var settings = {
+				url : url,
+				method : method,
+				contentType : 'application/json',
+				headers : {
+					"Authorization" : localStorage.getItem("Authorization"),
+					"Content-Type" : "application/x-www-form-urlencoded"
+				}
+			};
+			//
+			$.ajax(settings).done(function(response) {
+				callback(response);
+			});
+		}
+	</script>
+</body>
+</html>

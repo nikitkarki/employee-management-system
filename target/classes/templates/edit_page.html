@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Employee Management System</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	crossorigin="anonymous">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<div class="container">
+		<h1>Employee Management System</h1>
+		<hr>
+		<h2>Edit Employee</h2>
+
+		<form class="save" th:action="@{'/edit/employee/'+${editEmployee.id}}"
+			th:object="${employee}" method="POST">
+			<input name="firstName" type="text" placeholder="Employee First Name"
+				class="form-control mb-4 col-4" th:value="${editEmployee.firstName}">
+			<input name="lastName" type="text" placeholder="Employee Last Name"
+				class="form-control mb-4 col-4" th:value="${editEmployee.lastName}">
+			<input name="email" type="text" placeholder="Employee Email"
+				class="form-control mb-4 col-4" th:value="${editEmployee.email}">
+			<input name="phone" type="text" placeholder="Employee Phone number"
+				class="form-control mb-4 col-4" th:value="${editEmployee.phone}">
+			<select name="designation[]" id="mySelect" multiple="multiple">
+				<option value="Receptionist">Receptionist</option>
+				<option value="Accountant">Accountant</option>
+				<option value="Sr. Java Developer">Sr. Java Developer</option>
+				<option value="Mid Level Java Developer">Mid Level Java
+					Developer</option>
+				<option value="Jr. Java Developer">Jr. Java Developer</option>
+			</select>
+			<button type="submit" class="btn btn-info col-2">Save
+				Employee</button>
+		</form>
+		<hr>
+		<a class="back" th:href="@{/all/1/5/id}"> Back to Employee List</a>
+	</div>
+	<script type="text/javascript">
+		$(".save").on("submit", function(e) {
+			e.preventDefault();
+			$(this).serializeArray();
+			var formData = [];
+			$.each($(".save").serializeArray(), function() {
+				formData[this.name] = this.value;
+			});
+			var mySelections = [];
+			$('#mySelect option').each(function(i) {
+				if (this.selected == true) {
+					mySelections.push({
+						"title" : this.value
+					});
+				}
+			});
+			var settings = {
+				url : this.action,
+				method : "PUT",
+				contentType : 'application/json',
+				headers : {
+					"Authorization" : localStorage.getItem("Authorization"),
+					"Content-Type" : "application/json"
+				},
+				data : JSON.stringify({
+					"firstName" : formData.firstName,
+					"lastName" : formData.lastName,
+					"email" : formData.email,
+					"phone" : formData.phone,
+					"designation": mySelections
+				})
+			};
+			$.ajax(settings).done(function(response) {
+				$("#response").html("Employee Updated!!");
+			});
+		});
+		$(".back").on("click", function(e) {
+			e.preventDefault();
+			var settings = {
+				url : "http://localhost:8080/all/1/5/id",
+				method : "GET",
+				contentType : 'application/json',
+				headers : {
+					"Authorization" : localStorage.getItem("Authorization"),
+					"Content-Type" : "application/x-www-form-urlencoded"
+				}
+			};
+			$.ajax(settings).done(function(response) {
+				$("#response").html(response);
+			});
+		});
+		
+	</script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var designation = /*[[${editEmployee.designation}]]*/ null;
+		designation=designation.map(function(v){
+			return v.title;
+		});
+		$.each($("#mySelect option"),function(t,e){
+			if(designation.indexOf(e.value)>=0){
+			e.selected="selected";
+			}
+			});
+		/*]]>*/
+	</script>
+</body>
+</html>

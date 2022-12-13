@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Home page</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<p>
+		<span>Welcome</span>
+	</p>
+	<p>
+		<button id="logout">Log out</button>
+	</p>
+	<form>
+		<button id="list">List Employee</button>
+		<button id="add">Add Employee</button>
+	</form>
+	<div id="response"></div>
+	<script type="text/javascript">
+		$("#list").on("click", function(e) {
+			e.preventDefault();
+			var settings = {
+				url : "http://localhost:8080/all/1/5/id",
+				method : "GET",
+				contentType : 'application/json',
+				timeout : 0,
+				headers : {
+					"Authorization" : localStorage.getItem("Authorization"),
+					"Content-Type" : "application/x-www-form-urlencoded"
+				}
+			};
+			//
+			$.ajax(settings).done(function(response) {
+				$("#response").html(response);
+			});
+		});
+		$("#logout").on("click", function(e) {
+			localStorage.clear();
+			window.location.href = "/login";
+		});
+		$("#add").on("click", function(e) {
+			e.preventDefault();
+			var settings = {
+				url : "http://localhost:8080/add_employee",
+				method : "GET",
+				contentType : 'application/json',
+				headers : {
+					"Authorization" : localStorage.getItem("Authorization"),
+					"Content-Type" : "application/x-www-form-urlencoded"
+				}
+			};
+			//
+			$.ajax(settings).done(function(response) {
+				$("#response").html(response);
+			});
+		})
+	</script>
+</body>
+</html>

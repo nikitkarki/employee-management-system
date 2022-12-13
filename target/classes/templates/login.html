@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Registration and Login</title>
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+<head>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+</head>
+
+<body>
+	<!-- create navigation bar ( header) -->
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">Employee
+					Management System</a>
+			</div>
+		</div>
+	</nav>
+
+	<br>
+	<br>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+
+				<h1>Sign-in</h1>
+
+
+				<form>
+					<div class="form-group">
+						<label for="username"> Username </label> : <input type="text"
+							class="form-control" id="username" name="username"
+							placeholder="Enter Email ID" autofocus="autofocus">
+					</div>
+
+					<div class="form-group">
+						<label for="password">Password</label>: <input type="password"
+							id="password" name="password" class="form-control"
+							placeholder="Enter Password" />
+					</div>
+					<button id="button">login</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		$("#button").on("click", function(e) {
+			e.preventDefault();
+
+			// var username = $("input#username").val();
+			// var password = $("input#password").val();
+
+			function make_base_auth(user, password) {
+				var tok = user + ':' + password;
+				var hash = btoa(tok);
+				return "Basic " + hash;
+			}
+
+			var settings = {
+				url : "http://localhost:8080/oauth/token",
+				method : "POST",
+				contentType : 'application/json',
+				timeout : 3600,
+				headers : {
+					"Authorization" : make_base_auth("client_id", "secret"),
+					"Content-Type" : "application/x-www-form-urlencoded"
+				},
+				data : {
+					"grant_type" : "password",
+					"client_id" : "client_id",
+					"username" : $("input#username").val(),
+					"password" : $("input#password").val()
+				}
+			};
+			//
+			$.ajax(settings).done(function(response) {
+				localStorage.setItem('Authorization', "Bearer "+response.access_token);
+				window.location.href = "/index";
+			});
+
+		});
+	</script>
+</body>
+</html>
